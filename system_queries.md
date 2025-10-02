@@ -136,3 +136,12 @@ FROM system.clusters
 WHERE cluster = 'your_cluster_name'
 ORDER BY shard_num, replica_num
 ```
+
+```sql
+SELECT
+    host_name,
+    replica_num,
+    database_replica_name
+FROM clusterAllReplicas('your_cluster_name', system.clusters)
+WHERE cluster = 'your_cluster_name'
+```

@@ -145,3 +145,40 @@ SELECT
 FROM clusterAllReplicas('your_cluster_name', system.clusters)
 WHERE cluster = 'your_cluster_name'
 ```
+
+
+```sql
+SELECT *
+FROM clusterAllReplicas('cluster', system.replicas)
+WHERE database = 'metric'
+
+---
+
+SELECT
+    host_name,
+    replica_num,
+    database_replica_name
+FROM clusterAllReplicas('cluster', system.clusters)
+WHERE cluster = 'cluster'
+
+---
+
+SELECT
+    r.database,
+    r.table,
+    r.replica_name,
+    r.active_replicas,
+    r.total_replicas,
+    c.host_name,
+    c.replica_num,
+    c.database_replica_name
+FROM
+    clusterAllReplicas('cluster', system.replicas) AS r
+JOIN
+    clusterAllReplicas('cluster', system.clusters) AS c
+ON
+    r.replica_name = c.database_replica_name
+WHERE
+    r.database = 'metric'
+    AND c.cluster = 'cluster'
+```

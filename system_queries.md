@@ -121,3 +121,18 @@ This will show you which error types are most common in your cluster, along with
 ---
 
 > These queries, when run regularly, will help you detect and diagnose most operational problems and frequent errors in your ClickHouse cluster, as described in the official documentation and community best practices.
+
+---
+
+```sql
+SELECT
+    cluster,
+    shard_num,
+    replica_num,
+    host_name,
+    host_address,
+    database_replica_name
+FROM system.clusters
+WHERE cluster = 'your_cluster_name'
+ORDER BY shard_num, replica_num
+```

@@ -182,3 +182,117 @@ WHERE
     r.database = 'metric'
     AND c.cluster = 'cluster'
 ```
+
+
+SelectQuery & InsertQuery
+
+```sql
+
+SELECT
+    query_kind,
+    count() AS total
+FROM system.query_log
+WHERE type = 'QueryStart'
+  AND event_time > (now() - toIntervalMinute(10))
+GROUP BY query_kind
+
+---
+
+SELECT
+    event,
+    value
+FROM system.events
+WHERE event IN ('Query', 'SelectQuery', 'InsertQuery')
+
+
+```
+
+ReplicatedMergeTree
+
+```sql
+SELECT
+  database,
+  table,
+  replica_name,
+  is_active,
+  absolute_delay
+FROM system.replicas
+---
+
+SELECT
+  database,
+  table,
+  elapsed
+FROM system.merges
+
+---
+
+SELECT
+  database,
+  table,
+  mutation_id,
+  is_done,
+  create_time
+FROM system.mutations
+```
+
+mergetree
+
+```sql
+SELECT q.*
+FROM system.query_log q
+JOIN system.tables t
+  ON q.database = t.database AND q.table = t.name
+WHERE t.engine LIKE '%MergeTree%'
+  AND q.type = 'QueryStart'
+
+---
+
+SELECT
+    q.query_kind,
+    count(*) AS total
+FROM system.query_log q
+JOIN system.tables t
+  ON q.database = t.database AND q.table = t.name
+WHERE t.engine LIKE '%MergeTree%'
+  AND q.type = 'QueryStart'
+GROUP BY q.query_kind
+```
+
+zookeeper
+
+```sql
+SELECT name, value, changed   
+FROM system.errors   
+WHERE value > 0   
+ORDER BY value DESC;
+
+---
+
+SELECT database, table, replica_name, absolute_delay, queue_size, inserts_in_queue  
+FROM system.replicas   
+WHERE absolute_delay > 60  
+ORDER BY absolute_delay DESC;
+
+---
+
+SELECT database, table, replica_name, position, type, create_time, last_exception  
+FROM system.replication_queue   
+WHERE last_exception != ''  
+ORDER BY create_time DESC;
+---
+
+SELECT database, table, elapsed, progress, is_mutation, total_size_bytes_compressed  
+FROM system.merges   
+ORDER BY elapsed DESC;
+
+---
+
+SELECT database, table, count() as part_count
+FROM system.parts 
+WHERE active = 1
+GROUP BY database, table
+ORDER BY count() DESC;
+
+
+```
